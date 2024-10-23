@@ -1,10 +1,10 @@
 hart_ids: [0]
 hart0:
-  ISA: RV32IMACZicsr_Zifencei
+  ISA: RV32IFZicsr
   physical_addr_sz: 32
   supported_xlen: [32]
   misa:
-    reset-val: 0x0
+    reset-val: 0x120
     rv32:
       mxl:
         implemented: false

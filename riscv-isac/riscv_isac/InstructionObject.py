@@ -26,7 +26,7 @@ unsgn_rs1 = ['sw','sd','sh','sb','ld','lw','lwu','lh','lhu','lb', 'lbu','flw','f
         'bset','zext.h','sext.h','sext.b','zext.b','zext.w','minu','maxu','orc.b','add.uw','sh1add.uw',\
         'sh2add.uw','sh3add.uw','slli.uw','clz','clzw','ctz','ctzw','cpop','cpopw','rev8',\
         'bclri','bexti','binvi','bseti','fcvt.d.wu','fcvt.s.wu','fcvt.d.lu','fcvt.s.lu','c.flwsp',\
-        'c.not', 'c.sext.b','c.sext.h','c.zext.b','c.zext.h','c.zext.w','sc.w','lr.w','sc.d','lr.d']
+        'c.not', 'c.sext.b','c.sext.h','c.zext.b','c.zext.h','c.zext.w','sc.w','lr.w','sc.d','lr.d','cm.push']
 unsgn_rs2 = ['bgeu', 'bltu', 'sltiu', 'sltu', 'sll', 'srl', 'sra','mulhu',\
         'mulhsu','divu','remu','divuw','remuw','aes64ds','aes64dsm','aes64es',\
         'aes64esm','aes64ks2','sm4ed','sm4ks','ror','rol','rorw','rolw','clmul',\
@@ -151,7 +151,7 @@ class instructionObject():
         :param csr_regfile: Architectural state of CSR register files
         :param instr_vars: Dictionary to be populated by the evaluated instruction variables
         '''
-
+        
         instr_vars['xlen'] = xlen
         instr_vars['flen'] = flen
         instr_vars['mode'] = self.mode
@@ -187,7 +187,11 @@ class instructionObject():
         imm_val = instr_vars.get('imm_val', None)
 
         #Update the values for the trap registers
-        self.trap_registers_update(instr_vars,self.trap_dict)
+
+# Check if self.trap_dict is not None before calling trap_registers_update
+        if self.trap_dict is not None:
+            self.trap_registers_update(instr_vars, self.trap_dict)
+
 
         # capture the register operand values
         rs1_val = self.evaluate_instr_var("rs1_val", instr_vars, arch_state)
@@ -314,10 +318,12 @@ class instructionObject():
         arch_state.pc = self.instr_addr
 
         commitvalue = self.reg_commit
+
+
         if commitvalue is not None:
-            if self.rd[1] == 'x':
+            if self.rd is not None and self.rd[1] == 'x':
                 arch_state.x_rf[int(commitvalue[1])] =  str(commitvalue[2][2:])
-            elif self.rd[1] == 'f':
+            elif self.rd is not None and self.rd[1] == 'f':
                 arch_state.f_rf[int(commitvalue[1])] =  str(commitvalue[2][2:])
 
         csr_commit = self.csr_commit
@@ -349,7 +355,7 @@ class instructionObject():
                 inxFlag = self.inxFlg
             ): # could just instr_name suffice?
                 return func(self, *args)
-
+        
         return None
 
     def ptw_update(self,instr_vars):
@@ -438,29 +444,30 @@ class instructionObject():
                 match.append('SV57')
             else:
                 match.append(0)
-        if (len(self.vm_addr_dict['iptw_list'])) != 0:
-            if match[0] == 'VM' and match[1] in ['SV32', 'SV39', 'SV48', 'SV57']:
-                format_max_len_mapping = {'SV32': 2, 'SV39': 3, 'SV48': 4, 'SV57': 5}
-                max_len = format_max_len_mapping.get(match[1],0)
-                size = len(self.vm_addr_dict['iptw_list'])
-                iptw_dict['len_iptw'] = size
-                remain = max_len
-                length = max_len - size - 1
-                for i in range(size):
-                    iptw_dict[f'iptw{max_len-1}a'] = int(self.vm_addr_dict['iptw_list'][i][0], 16)
-                    iptw_dict[f'iptw{max_len-1}cont'] = int(self.vm_addr_dict['iptw_list'][i][1], 16)
-                    max_len = max_len -1
-                for i in range(length, -1, -1):
-                    iptw_dict[f'iptw{i}a'] = None
-                    iptw_dict[f'iptw{i}cont'] = None
-                for i in range(remain, 5):
-                    iptw_dict[f'iptw{i}a'] = None
-                    iptw_dict[f'iptw{i}cont'] = None
-            else:
-                for i in range(0, 5):
-                    iptw_dict[f'iptw{i}a'] = None
-                    iptw_dict[f'iptw{i}cont'] = None
-                iptw_dict['len_iptw'] = 0
+        if self.vm_addr_dict is not None and 'iptw_list' in self.vm_addr_dict :
+            if (len(self.vm_addr_dict['iptw_list'])) != 0:
+                if match[0] == 'VM' and match[1] in ['SV32', 'SV39', 'SV48', 'SV57']:
+                    format_max_len_mapping = {'SV32': 2, 'SV39': 3, 'SV48': 4, 'SV57': 5}
+                    max_len = format_max_len_mapping.get(match[1],0)
+                    size = len(self.vm_addr_dict['iptw_list'])
+                    iptw_dict['len_iptw'] = size
+                    remain = max_len
+                    length = max_len - size - 1
+                    for i in range(size):
+                        iptw_dict[f'iptw{max_len-1}a'] = int(self.vm_addr_dict['iptw_list'][i][0], 16)
+                        iptw_dict[f'iptw{max_len-1}cont'] = int(self.vm_addr_dict['iptw_list'][i][1], 16)
+                        max_len = max_len -1
+                    for i in range(length, -1, -1):
+                        iptw_dict[f'iptw{i}a'] = None
+                        iptw_dict[f'iptw{i}cont'] = None
+                    for i in range(remain, 5):
+                        iptw_dict[f'iptw{i}a'] = None
+                        iptw_dict[f'iptw{i}cont'] = None
+                else:
+                    for i in range(0, 5):
+                        iptw_dict[f'iptw{i}a'] = None
+                        iptw_dict[f'iptw{i}cont'] = None
+                    iptw_dict['len_iptw'] = 0
         elif self.mode == 'M':
             for i in range(0, 5):
                 iptw_dict[f'iptw{i}a'] = None

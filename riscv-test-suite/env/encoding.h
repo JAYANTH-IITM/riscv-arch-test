@@ -869,6 +869,7 @@
 #define CSR_TDATA1 0x7a1
 #define CSR_TDATA2 0x7a2
 #define CSR_TDATA3 0x7a3
+#define CSR_JVT            0x017
 #define CSR_DCSR 0x7b0
 #define CSR_DPC 0x7b1
 #define CSR_DSCRATCH 0x7b2

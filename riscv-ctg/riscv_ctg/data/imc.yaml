@@ -1890,3 +1890,140 @@ c.jalr:
     // opcode: c.jalr; op1:$rs1
     TEST_CJALR_OP($testreg, $rs1, $swreg, $offset)
 
+cm.push:
+  sig:
+    stride: 1
+    sz: 'XLEN/8'
+  rs1_op_data: *ra_regs
+  xlen: [32,64]
+  std_op:
+  isa: 
+    - I_Zca_Zcmp
+  formattype: 'cmppformat'
+  rlist_data: 'gen_rlist_dataset(4)'
+  imm_val_data: 'gen_imm2_dataset(2)'
+  template: |-
+
+    // $comment
+    // opcode: $inst; immval:$imm_val ; op1:$rs1 ; rlist:$rlist 
+    TEST_PUSH($inst,$imm_val,$rs1,$rlist)
+
+cm.pop:
+  sig:
+    stride: 1
+    sz: 'XLEN/8'
+  rs1_op_data: *ra_regs
+  xlen: [32,64]
+  std_op:
+  isa: 
+    - I_Zca_Zcmp
+  formattype: 'cmppformat'
+  rlist_data: 'gen_rlist_dataset(4)'
+  imm_val_data: 'gen_imm2_dataset(2)'
+  template: |-
+
+    // $comment
+    // opcode: $inst; immval:$imm_val ; op1:$rs1 ; rlist:$rlist 
+    TEST_POP_POPRET_POPRETZ($inst,$imm_val,$rs1,$rlist)
+
+cm.popret:
+  sig:
+    stride: 1
+    sz: 'XLEN/8'
+  rs1_op_data: *ra_regs
+  xlen: [32,64]
+  std_op:
+  isa: 
+    - I_Zca_Zcmp
+  formattype: 'cmppformat'
+  rlist_data: 'gen_rlist_dataset(4)'
+  imm_val_data: 'gen_imm2_dataset(2)'
+  template: |-
+
+    // $comment
+    // opcode: $inst; immval:$imm_val ; op1:$rs1 ; rlist:$rlist 
+    TEST_POP_POPRET_POPRETZ($inst,$imm_val,$rs1,$rlist)
+
+cm.popretz:
+  sig:
+    stride: 1
+    sz: 'XLEN/8'
+  rs1_op_data: *ra_regs
+  xlen: [32,64]
+  std_op:
+  isa: 
+    - I_Zca_Zcmp
+  formattype: 'cmppformat'
+  rlist_data: 'gen_rlist_dataset(4)'
+  imm_val_data: 'gen_imm2_dataset(2)'
+  template: |-
+
+    // $comment
+    // opcode: $inst; immval:$imm_val ; op1:$rs1 ; rlist:$rlist 
+    TEST_POP_POPRET_POPRETZ($inst,$imm_val,$rs1,$rlist)
+
+cm.mva01s:
+  sig:
+    stride: 1
+    sz: 'XLEN/8'
+  rs1_op_data: *s1_regs
+  rs2_op_data: *s2_regs
+  xlen: [32,64]
+  std_op:
+  isa: 
+    - I_Zca_Zcmp
+  formattype: 'cmmvformat'
+  template: |-
+
+    // $comment
+    // opcode: $inst ; op1:$rs1 ;  op2:$rs2 ;
+    TEST_MVAS($inst,$rs1,$rs2)
+
+cm.mvsa01:
+  sig:
+    stride: 1
+    sz: 'XLEN/8'
+  rs1_op_data: *s1_regs
+  rs2_op_data: *s2_regs
+  xlen: [32,64]
+  std_op:
+  isa: 
+    - I_Zca_Zcmp
+  formattype: 'cmmvformat'
+  template: |-
+
+    // $comment
+    // opcode: $inst ; op1:$rs1 ;  op2:$rs2 ;
+    TEST_MVSA($inst,$rs1,$rs2)
+
+cm.jt:
+  sig:
+    stride: 1
+    sz: 'XLEN/8'
+  xlen: [32,64]
+  std_op:
+  isa: 
+    - I_Zca_Zcmt
+  formattype: 'cmjtformat'
+  imm_val_data: 'gen_cmjt_dataset(8)'
+  template: |-
+
+    // $comment
+    // opcode: opcode: $inst; immval:$imm_val ;
+    TEST_CMJT($testreg,$inst,$imm_val,$swreg)
+
+cm.jalt:
+  sig:
+    stride: 1
+    sz: 'XLEN/8'
+  xlen: [32,64]
+  std_op:
+  isa: 
+    - I_Zca_Zcmt
+  formattype: 'cmjtformat'
+  imm_val_data: 'gen_cmjalt_dataset(8)'
+  template: |-
+
+    // $comment
+    // opcode: opcode: $inst; immval:$imm_val ;
+    TEST_CMJALT($testreg,$inst,$imm_val,$swreg)

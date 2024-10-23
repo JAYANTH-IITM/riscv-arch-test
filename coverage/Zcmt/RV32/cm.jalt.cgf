@@ -1,0 +1,7 @@
+cm.jalt:
+    config: 
+      - check ISA:=regex(.*I.*Zca.*Zcmt.*)
+    mnemonics: 
+      cm.jalt: 0
+    val_comb:
+      'imm_val >= 32 and imm_val < 256': 0

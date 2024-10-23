@@ -1,0 +1,12 @@
+cm.popret:
+    config: 
+      - check ISA:=regex(.*I.*Zca.*Zcmp.*)
+    mnemonics: 
+      cm.popret: 0
+    rs1:
+      <<: *ra_regs   
+    val_comb:
+      'imm_val == 0': 0
+      'imm_val == 1': 0
+      'imm_val == 2': 0
+      'imm_val == 3': 0

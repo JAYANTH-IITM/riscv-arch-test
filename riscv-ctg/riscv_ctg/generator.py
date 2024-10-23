@@ -13,6 +13,8 @@ import struct
 import sys
 import itertools
 import re
+from itertools import chain
+import random
 
 # F
 one_operand_finstructions = ["fsqrt.s","fmv.x.w","fcvt.wu.s","fcvt.w.s","fclass.s","fcvt.l.s","fcvt.lu.s","fcvt.s.l","fcvt.s.lu"]
@@ -93,6 +95,8 @@ OPS = {
     'ckformat': ['rs1'],
     'kformat': ['rs1','rd'],
     'ckformat': ['rs1'],
+    'cmppformat': ['rs1'],
+    'cmmvformat': ['rs1','rs2'],
     # 'frformat': ['rs1', 'rs2', 'rd'],
     'fsrformat': ['rs1', 'rd'],
     # 'fr4format': ['rs1', 'rs2', 'rs3', 'rd'],
@@ -113,6 +117,7 @@ OPS = {
     'ppbrrformat': ['rs1', 'rs2', 'rd'],
     'prrformat': ['rs1', 'rs2', 'rd'],
     'prrrformat': ['rs1', 'rs2', 'rs3', 'rd'],
+    'cmjtformat':[],
     'dcasrformat': ['rs1', 'rs2', 'rd']
 }
 ''' Dictionary mapping instruction formats to operands used by those formats '''
@@ -130,6 +135,7 @@ VALS = {
     'bformat': "['rs1_val', 'rs2_val', 'imm_val']",
     'uformat': "['imm_val']",
     'jformat': "['imm_val']",
+    'cmppformat': "['imm_val']",
     'crformat': "['rs1_val', 'rs2_val']",
     'cmvformat': "['rs2_val']",
     'ciformat': "['rs1_val', 'imm_val']",
@@ -170,6 +176,8 @@ VALS = {
     'ppbrrformat': '["rs1_val"] + simd_val_vars("rs2", xlen, 8)',
     'prrformat': '["rs1_val", "rs2_val"]',
     'prrrformat': "['rs1_val', 'rs2_val' , 'rs3_val']",
+    'cmjtformat':"['imm_val']",
+    'cmmvformat':"[]",
     'dcasrformat': '["rs1_val", "rs2_val"]'
 }
 ''' Dictionary mapping instruction formats to operand value variables used by those formats '''
@@ -283,6 +291,8 @@ class Generator():
 
         if opcode in ['sw', 'sh', 'sb', 'lw', 'lhu', 'lh', 'lb', 'lbu', 'ld', 'lwu', 'sd',"jal","beq","bge","bgeu","blt","bltu","bne","jalr","c.jalr","c.jr","flw","fsw","fld","fsd","flh","fsh","c.lbu","c.lhu","c.lh","c.sb","c.sh","c.flw"]:
             self.val_vars = self.val_vars + ['ea_align']
+        elif opcode in ['cm.push','cm.popret','cm.pop','cm.popretz']:
+            self.val_vars = self.val_vars + ['rlist']
         self.template = opnode['template']
         self.opnode = opnode
         # self.stride = opnode['stride']
@@ -731,6 +741,52 @@ class Generator():
                 instr[var] = str(self.datasets[var][0])
         return instr
 
+    def __cmpp_instr__(self, op=None, val=None):
+        rlist = val[1]
+        if rlist == 4:
+            op = ('x1', 'rs1==x1')
+        elif rlist == 5:
+            op = ('x8', 'rs1==x8')
+        elif rlist == 6:
+            op = ('x9', 'rs1==x9')
+        elif rlist == 7:
+            op = ('x18', 'rs1==x18')
+        elif rlist == 8:
+            op = ('x19', 'rs1==x19')
+        elif rlist == 9:
+            op = ('x20', 'rs1==x20')
+        elif rlist == 10:
+            op = ('x21', 'rs1==x21')
+        elif rlist == 11:
+            op = ('x22', 'rs1==x22')
+        elif rlist == 12:
+            op = ('x23', 'rs1==x23')
+        elif rlist == 13:
+            op = ('x24', 'rs1==x24')
+        elif rlist == 14:
+            op = ('x25', 'rs1==x25')
+        elif rlist == 15:
+            op = ('x27', 'rs1==x27')
+        cond_str = ''
+        if op:
+            cond_str += op[-1]+', '
+        if val:
+            cond_str += val[-1]
+        instr = {'inst':self.opcode,'index':'0', 'comment':cond_str}
+        if op:
+            for var,reg in zip(self.op_vars,op):
+                instr[var] = str(reg)
+        else:
+            for i,var in enumerate(self.op_vars):
+                instr[var]=self.default_regs[var]
+        if val:
+            for i,var in enumerate(self.val_vars):
+                instr[var] = str(val[i])
+        else:
+            for var in self.val_vars:
+                instr[var] = str(self.datasets[var][0])
+        return instr
+
     def __fext_instr__(self,op=None,val=None):
         rm_dict = {
                 0: 'rne',
@@ -826,6 +882,8 @@ class Generator():
                 instr_dict.append(self.__bfmt_instr__(op,val))
             elif self.opcode in ['c.jal', 'c.jalr']:
                 instr_dict.append(self.__cj_instr__(op,val))
+            elif self.opcode in ['cm.push', 'cm.pop','cm.popret','cm.popretz']:
+                instr_dict.append(self.__cmpp_instr__(op,val))
             elif self.fmt == 'jformat' or self.fmt == 'cjformat':
                 instr_dict.append(self.__jfmt_instr__(op,val))
             else:
@@ -844,6 +902,8 @@ class Generator():
                 instr_dict.append(self.__bfmt_instr__(op,val))
             elif self.opcode in ['c.jal', 'c.jalr']:
                 instr_dict.append(self.__cj_instr__(op,val))
+            elif self.opcode in ['cm.push', 'cm.pop','cm.popret','cm.popretz']:
+                instr_dict.append(self.__cmpp_instr__(op,val))
             elif self.fmt == 'jformat':
                 instr_dict.append(self.__jfmt_instr__(op,val))
             else:
@@ -888,7 +948,7 @@ class Generator():
             if (is_fp_instruction(insn)):
                 insn = "fadd.s"
             instr_obj = instructionObject(None, insn, None)
-            ext_specific_vars = instr_obj.evaluate_instr_var("ext_specific_vars", {**var_dict, 'flen': self.flen, 'iflen': self.iflen}, None, {'fcsr': hex(var_dict.get('fcsr', 0))})
+            ext_specific_vars = instr_obj.evaluate_instr_var("ext_specific_vars", {**var_dict, 'flen': self.flen, 'iflen': self.iflen , 'inxFlag': self.inxFlag, 'xlen': self.xlen}, None, {'fcsr': hex(var_dict.get('fcsr', 0))})
 
             if ext_specific_vars is not None:
                 var_dict.update(ext_specific_vars)

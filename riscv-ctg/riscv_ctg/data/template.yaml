@@ -6,7 +6,10 @@ metadata:
   c_regs: &c_regs "['x'+str(x) for x in range(8,16)]"
   pair_regs: &pair_regs "['x'+str(x) for x in range(2,32 if 'e' not in base_isa else 16, 2 if xlen == 32 else 1)]"
   rv32rv64pair_regs: &rv32rv64pair_regs "['x'+str(x) for x in range(2,30 if 'e' not in base_isa else 16, 2)]"
-
+  ra_regs: &ra_regs "['x'+str(x) for x in chain(range(1,2),range(8,10),range(18,26),range(27,28))]"
+  s1_regs: &s1_regs "['s'+str(x) for x in (range(0,8))]"
+  s2_regs: &s2_regs "['s'+str(x) for x in (range(0,8))]"
+ 
 aes32dsi:
   sig:
     stride: 1

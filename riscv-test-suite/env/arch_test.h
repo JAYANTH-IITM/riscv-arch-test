@@ -252,11 +252,93 @@
     #define LREG lw
     #define XLEN_WIDTH 5
     #define LREGWU lw
+    #define WORD .word    
+    #define rlist4  {x1}
+    #define rlist5  {x1,x8}
+    #define rlist6  {x1,x8-x9}
+    #define rlist7  {x1,x8-x9,x18}
+    #define rlist8  {x1,x8-x9,x18-x19}
+    #define rlist9  {x1,x8-x9,x18-x20}
+    #define rlist10 {x1,x8-x9,x18-x21}
+    #define rlist11 {x1,x8-x9,x18-x22}
+    #define rlist12 {x1,x8-x9,x18-x23}
+    #define rlist13 {x1,x8-x9,x18-x24}
+    #define rlist14 {x1,x8-x9,x18-x25}
+    #define rlist15 {x1,x8-x9,x18-x27}
+    #define VAL0 16
+    #define VAL1 32
+    #define VAL2 48
+    #define VAL3 64
+    #define VAL4 16
+    #define VAL5 32
+    #define VAL6 48
+    #define VAL7 64
+    #define VAL8 32
+    #define VAL9 48
+    #define VAL10 64
+    #define VAL11 80
+    #define VAL12 32
+    #define VAL13 48
+    #define VAL14 64
+    #define VAL15 80
+    #define VAL16 48
+    #define VAL17 64
+    #define VAL18 80
+    #define VAL19 96 
+    #define VAL20 48
+    #define VAL21 64
+    #define VAL22 80
+    #define VAL23 96 
+    #define VAL24 64
+    #define VAL25 80
+    #define VAL26 96
+    #define VAL27 112    
 #elif XLEN==64
     #define SREG sd
     #define LREG ld
     #define XLEN_WIDTH 6
     #define LREGWU lwu
+    #define WORD .dword
+    #define rlist4  {x1}
+    #define rlist5  {x1,x8}
+    #define rlist6  {x1,x8-x9}
+    #define rlist7  {x1,x8-x9,x18}
+    #define rlist8  {x1,x8-x9,x18-x19}
+    #define rlist9  {x1,x8-x9,x18-x20}
+    #define rlist10 {x1,x8-x9,x18-x21}
+    #define rlist11 {x1,x8-x9,x18-x22}
+    #define rlist12 {x1,x8-x9,x18-x23}
+    #define rlist13 {x1,x8-x9,x18-x24}
+    #define rlist14 {x1,x8-x9,x18-x25}
+    #define rlist15 {x1,x8-x9,x18-x27}
+    #define VAL0 16
+    #define VAL1 32
+    #define VAL2 48
+    #define VAL3 64
+    #define VAL4 32
+    #define VAL5 48
+    #define VAL6 64
+    #define VAL7 80 
+    #define VAL8 48
+    #define VAL9 64
+    #define VAL10 80
+    #define VAL11 96
+    #define VAL12 64
+    #define VAL13 80
+    #define VAL14 96
+    #define VAL15 112
+    #define VAL16 80
+    #define VAL17 96
+    #define VAL18 112
+    #define VAL19 128
+    #define VAL20 96
+    #define VAL21 112
+    #define VAL22 128
+    #define VAL23 144
+    #define VAL24 112
+    #define VAL25 128
+    #define VAL26 144
+    #define VAL27 160
 #else
     #define SREG sq
     #define LREG lq
@@ -481,15 +563,11 @@
 
 /**** fixed length LA macro; alignment and rvc/norvc unknown before execution ****/
 #define LA(reg,val)     ;\
-    .ifnc(reg, X0)       ;\
         .option push    ;\
-        .option rvc     ;\
-        .align UNROLLSZ ;\
         .option norvc   ;\
         la reg,val      ;\
-        .align UNROLLSZ ;\
         .option pop     ;\
-    .endif
+
 #define ADDI(dst, src, imm) /* helper*/ ;\
 .if ((imm<=2048) & (imm>=-2048))        ;\
         addi    dst, src, imm           ;\
@@ -1868,9 +1946,9 @@ rvtest_\__MODE__\()end:
 /************************************************************************************/
 .macro RVTEST_CODE_BEGIN
  .option push
- .option rvc
+ //.option rvc
  .align UNROLLSZ
- .option norvc
+ //.option norvc
  .section .text.init
  .globl  rvtest_init
  .global rvtest_code_begin              //define the label and make it available
@@ -1879,7 +1957,7 @@ rvtest_init:                            //instantiate prologs here
   INSTANTIATE_MODE_MACRO RVTEST_TRAP_PROLOG
 rvtest_entrypoint:
 // RVMODEL_BOOT                        // Commenting this one as temporary fix
-  RVTEST_INIT_GPRS                      // 0xF0E1D2C3B4A59687
+//  RVTEST_INIT_GPRS                      // 0xF0E1D2C3B4A59687
 rvtest_code_begin:
  .option pop
 .endm                                   //end of RVTEST_CODE_BEGIN
@@ -1901,9 +1979,9 @@ rvtest_code_begin:
 
 .macro RVTEST_CODE_END          // test is ended, but in no particular mode
   .option push
-  .option norvc
+//  .option norvc
   .global rvtest_code_end       // define the label and make it available
-  .global cleanup_epilogs       // ****ALERT: tests must populate x1 with a point to the end of regular sig area
+//  .global cleanup_epilogs       // ****ALERT: tests must populate x1 with a point to the end of regular sig area
 /**** MPRV must be clear here !!! ****/
 rvtest_code_end:                // RVMODEL_HALT should get here
   #ifdef rvtest_gpr_save        // gpr_save area is instantiated at end of signature

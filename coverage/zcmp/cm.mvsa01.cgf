@@ -1,0 +1,9 @@
+cm.mvsa01:
+    config: 
+      - check ISA:=regex(.*I.*Zca.*Zcmp.*)
+    mnemonics: 
+      cm.mvsa01: 0
+    rs1:
+      <<: *s1_regs
+    rs2:
+      <<: *s2_regs

@@ -1,0 +1,7 @@
+cm.jt:
+    config: 
+      - check ISA:=regex(.*I.*Zca.*Zcmt.*)
+    mnemonics: 
+      cm.jt: 0
+    val_comb:
+      'imm_val >= 0 and imm_val < 32': 0

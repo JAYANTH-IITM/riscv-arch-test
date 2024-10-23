@@ -159,7 +159,8 @@ csr_reg_num_to_str = {
     940: 'pmpcfg12',
     941: 'pmpcfg13',
     942: 'pmpcfg14',
-    943: 'pmpcfg15'
+    943: 'pmpcfg15',
+    23: 'jvt'
 }
 
 class cross():
@@ -961,7 +962,7 @@ def compute_per_line(queue, event, cgf_queue, stats_queue, cgf, xlen, flen, addr
             instr.evaluate_instr_vars(xlen, flen, arch_state, csr_regfile, instr_vars)
 
             #update the state of trap registers in csr_reg file using instr_vars
-            if instr_vars["mode_change"] is not None:  #change the state only on the instruction
+            if 'mode_change' in instr_vars and instr_vars["mode_change"] is not None:  #change the state only on the instruction
                 csr_regfile["mcause"] = instr_vars["mcause"]
                 csr_regfile["scause"] = instr_vars["scause"]
                 csr_regfile["mtval"] = instr_vars["mtval"]
@@ -1059,7 +1060,6 @@ def compute_per_line(queue, event, cgf_queue, stats_queue, cgf, xlen, flen, addr
             globals()['get_pte_prop'] = get_pte_prop
 
             if enable :
-                print(instr_vars)
                 ucovpt = []
                 covpt = []
                 csr_covpt = []

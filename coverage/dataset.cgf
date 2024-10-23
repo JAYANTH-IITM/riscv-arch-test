@@ -180,6 +180,40 @@ datasets:
     x13: 0
     x14: 0
     x15: 0
+
+  ra_regs: &ra_regs
+    x1: 0
+    x8: 0
+    x9: 0
+    x18: 0
+    x19: 0
+    x20: 0
+    x21: 0
+    x22: 0
+    x23: 0
+    x24: 0
+    x25: 0
+    x27: 0
+
+  s1_regs: &s1_regs
+    s0: 0
+    s1: 0
+    s2: 0
+    s3: 0
+    s4: 0
+    s5: 0
+    s6: 0
+    s7: 0
+
+  s2_regs: &s2_regs
+    s0: 0
+    s1: 0
+    s2: 0
+    s3: 0
+    s4: 0
+    s5: 0
+    s6: 0
+    s7: 0  
   
   all_regs_mx2: &all_regs_mx2
     x1: 0

@@ -2244,6 +2244,26 @@ class disassembler():
         imm_7_6 = (instr & 0x000C) << 4
         imm_8_6 = (instr & 0x001C) << 4
 
+        bit_15 = self.get_bit(instr, 15)
+        bit_14 = self.get_bit(instr, 14)
+        bit_13 = self.get_bit(instr, 13)
+        bit_12 = self.get_bit(instr, 12)
+        bit_11 = self.get_bit(instr, 11)  
+        bit_10 = self.get_bit(instr, 10)     
+        bit_9 = self.get_bit(instr, 9)
+        bit_8 = self.get_bit(instr, 8)
+        bit_7 = self.get_bit(instr, 7)
+        bit_6 = self.get_bit(instr, 6)
+        bit_5 = self.get_bit(instr, 5)
+        bit_4 = self.get_bit(instr, 4)
+        bit_3 = self.get_bit(instr, 3)
+        bit_2 = self.get_bit(instr, 2)
+
+        funct6 = (bit_15 << 5) |(bit_14 << 4) | (bit_13 << 3) | (bit_12 << 2) | (bit_11 << 1) | (bit_10)
+        cmpp_funct2 = (bit_9 << 1) | (bit_8)
+        cmpp_imm = (bit_3 << 1) | (bit_2)
+        cmpp_rlist = (bit_7 << 3) |(bit_6 << 2) | (bit_5 << 1) | (bit_4)
+
         imm_5_3 = (instr & 0x1c00) >> 7
         imm_s_8_6 = (instr & 0x0380) >> 1
         imm_5_2 = (instr & 0x1E00) >> 7
@@ -2252,6 +2272,10 @@ class disassembler():
         rd = (self.C2_RD_MASK & instr) >> 7
         rs1 = (self.C2_RD_MASK & instr) >> 7
         rs2 = (self.C2_RS2_MASK & instr) >> 2
+        cmmv_rs1 = (bit_9 << 2) |(bit_8 << 1) | (bit_7)
+        cmmv_rd = cmmv_rs1
+        cmmv_rs2 = (bit_4 << 2) |(bit_3 << 1) | (bit_2)
+        cmmv_funct2 = (bit_6 << 1) | (bit_5) #1 for sa and 3 for as
 
         imm_slli = imm_5 + imm_4_0
         imm_fldsp = imm_5 + imm_4_3 + imm_8_6
@@ -2259,6 +2283,8 @@ class disassembler():
         imm_ldsp = imm_5 + imm_4_3 + imm_8_6
         imm_fsdsp = imm_5_3 + imm_s_8_6
         imm_swsp = imm_5_2 + imm_s_7_6
+        imm_cmjt = (instr >> 2) & 0xFF
+
 
         if funct3 == 0 and imm_slli !=0 and rd !=0:
             instrObj.instr_name = 'c.slli'
@@ -2270,6 +2296,12 @@ class disassembler():
             instrObj.rd = (rd, 'f')
             instrObj.imm = imm_fldsp
             instrObj.rs1 = (2, 'x')
+        elif funct6 == 40:
+            instrObj.imm = imm_cmjt
+            if imm_cmjt >= 32:
+                instrObj.instr_name = 'cm.jalt'
+            elif imm_cmjt < 32 :
+                instrObj.instr_name = 'cm.jt'
         elif funct3 == 2 and rd != 0:
             instrObj.instr_name = 'c.lwsp'
             instrObj.rs1 = (2, 'x')
@@ -2285,6 +2317,75 @@ class disassembler():
             instrObj.rd = (rd, 'f')
             instrObj.rs1 = (2, 'x')
             instrObj.imm = imm_ldsp
+        elif funct6 == 46:
+            if cmpp_funct2 == 2:
+                instrObj.instr_name = 'cm.pop'
+            elif cmpp_funct2 == 0:
+                instrObj.instr_name = 'cm.push'  
+            instrObj.imm = cmpp_imm
+            if cmpp_rlist == 15 :
+                instrObj.rs1 = (27 ,'x')
+            elif cmpp_rlist == 14 :
+                instrObj.rs1 = (25 ,'x')
+            elif cmpp_rlist == 13 :
+                instrObj.rs1 = (24 ,'x')
+            elif cmpp_rlist == 12 :
+                instrObj.rs1 = (23 ,'x')
+            elif cmpp_rlist == 11 :
+                instrObj.rs1 = (22 ,'x')
+            elif cmpp_rlist == 10 :
+                instrObj.rs1 = (21 ,'x')
+            elif cmpp_rlist == 9 :
+                instrObj.rs1 = (20 ,'x')
+            elif cmpp_rlist == 8 :
+                instrObj.rs1 = (19 ,'x')
+            elif cmpp_rlist == 7 :
+                instrObj.rs1 = (18 ,'x')
+            elif cmpp_rlist == 6 :
+                instrObj.rs1 = (9 ,'x')
+            elif cmpp_rlist == 5 :
+                instrObj.rs1 = (8 ,'x')
+            elif cmpp_rlist == 4 :
+                instrObj.rs1 = (1 ,'x')
+        elif funct6 == 47 :
+            if cmpp_funct2 == 2:
+                instrObj.instr_name = 'cm.popret'
+            elif cmpp_funct2 == 0:
+                instrObj.instr_name = 'cm.popretz'            
+            instrObj.imm = cmpp_imm
+            if cmpp_rlist == 15 :
+                instrObj.rs1 = (27 ,'x')
+            elif cmpp_rlist == 14 :
+                instrObj.rs1 = (25 ,'x')
+            elif cmpp_rlist == 13 :
+                instrObj.rs1 = (24 ,'x')
+            elif cmpp_rlist == 12 :
+                instrObj.rs1 = (23 ,'x')
+            elif cmpp_rlist == 11 :
+                instrObj.rs1 = (22 ,'x')
+            elif cmpp_rlist == 10 :
+                instrObj.rs1 = (21 ,'x')
+            elif cmpp_rlist == 9 :
+                instrObj.rs1 = (20 ,'x')
+            elif cmpp_rlist == 8 :
+                instrObj.rs1 = (19 ,'x')
+            elif cmpp_rlist == 7 :
+                instrObj.rs1 = (18 ,'x')
+            elif cmpp_rlist == 6 :
+                instrObj.rs1 = (9 ,'x')
+            elif cmpp_rlist == 5 :
+                instrObj.rs1 = (8 ,'x')
+            elif cmpp_rlist == 4 :
+                instrObj.rs1 = (1 ,'x')
+        elif funct6 == 43 :
+            if cmmv_funct2 == 3:
+                instrObj.instr_name = 'cm.mva01s'
+                instrObj.rs1 = (cmmv_rs1 ,'s')
+                instrObj.rs2 = (cmmv_rs2 ,'s')
+            elif cmmv_funct2 == 1:
+                instrObj.instr_name = 'cm.mvsa01'
+                instrObj.rs1 = (cmmv_rs1 ,'s')
+                instrObj.rs2 = (cmmv_rs2 ,'s')               
         elif funct3 == 4 and rs1 != 0 and imm_5 == 0 and rs2 == 0:
             instrObj.instr_name = 'c.jr'
             instrObj.rs1 = (rs1, 'x')

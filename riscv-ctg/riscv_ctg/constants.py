@@ -66,6 +66,69 @@ def gen_imm_dataset(bit_width):
         dataset.append(i)
     return dataset
 
+def gen_imm2_dataset(bit_width):
+    '''
+    Function to enumerate a dataset for immediate values:
+     - [0,2**bit_width]
+
+     :param bit_width: Integer defining the size of the input
+     :type bit_width: int
+     :return: a list of integers
+    '''
+    usign_val = (2**(bit_width))
+    dataset = []
+    for i in range(usign_val):
+        dataset.append(i)
+    return dataset
+
+def gen_rlist_dataset(bit_width):
+    '''
+    Function to enumerate a dataset for immediate values:
+     - [0,2**bit_width]
+
+     :param bit_width: Integer defining the size of the input
+     :type bit_width: int
+     :return: a list of integers
+    '''
+    usign_val = (2**(bit_width))
+    dataset = []
+    for i in range(usign_val):
+        if(i>=4):
+            dataset.append(i)
+    return dataset
+
+def gen_cmjt_dataset(bit_width):
+    '''
+    Function to enumerate a dataset for immediate values:
+     - [0,2**bit_width]
+
+     :param bit_width: Integer defining the size of the input
+     :type bit_width: int
+     :return: a list of integers
+    '''
+    usign_val = (2**(bit_width))
+    dataset = []
+    for i in range(usign_val):
+            dataset.append(i)
+
+    return dataset
+
+def gen_cmjalt_dataset(bit_width):
+    '''
+    Function to enumerate a dataset for immediate values:
+     - [0,2**bit_width]
+
+     :param bit_width: Integer defining the size of the input
+     :type bit_width: int
+     :return: a list of integers
+    '''
+    usign_val = (2**(bit_width))
+    dataset = []
+    for i in range(usign_val):
+            dataset.append(i)
+
+    return dataset
+
 def gen_sp_dataset(bit_width,sign=True):
     '''
     Function generates a special dataset of interesting values:
