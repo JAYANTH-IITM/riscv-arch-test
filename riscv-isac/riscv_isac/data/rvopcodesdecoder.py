@@ -400,7 +400,7 @@ class disassembler():
                     if any([instr_name.startswith(x) for x in [
                             'fsh', 'fsw','fsd','fcvt.s','fcvt.d','fmv.w','fmv.l','fcvt.h','fmv.h','flh','fclass','fsqrt','fmax','fmin','fadd','fsub','feq','fle','flt','fmul','fdiv','fsgnj','fsgnjn','fsgnjx']]):
                         treg = 'x'
-                    temp_instrobj.rs2 = (int(get_arg_val(arg)(mcode), 2), treg
+                    temp_instrobj.rs2 = (int(get_arg_val(arg)(mcode), 2), treg)
                     if 'p' in arg:
                         temp_instrobj.rd = (8+int(get_arg_val(arg)(mcode), 2), treg)
                     else:
@@ -452,6 +452,43 @@ class disassembler():
                     temp_instrobj.rm = int(get_arg_val(arg)(mcode), 2)
                 if arg == 'csr':
                     temp_instrobj.imm = int(get_arg_val(arg)(mcode), 2)
+                if 'c_rlist' in arg: #c_sreg1 c_sreg2
+                    temp_instrobj.c_rlist = int(get_arg_val(arg)(mcode), 2)
+                    temp_rlist_val = int(get_arg_val(arg)(mcode), 2)
+                    if temp_rlist_val == 15:
+                        temp_instrobj.rs1 = (27,'x')
+                    elif temp_rlist_val == 14:
+                        temp_instrobj.rs1 = (25,'x') 
+                    elif temp_rlist_val == 13:
+                        temp_instrobj.rs1 = (24,'x')
+                    elif temp_rlist_val == 12:
+                        temp_instrobj.rs1 = (23,'x')
+                    elif temp_rlist_val == 11:
+                        temp_instrobj.rs1 = (22,'x')
+                    elif temp_rlist_val == 10:
+                        temp_instrobj.rs1 = (21,'x')
+                    elif temp_rlist_val == 9:
+                        temp_instrobj.rs1 = (20,'x')
+                    elif temp_rlist_val == 8:
+                        temp_instrobj.rs1 = (19,'x')
+                    elif temp_rlist_val == 7:
+                        temp_instrobj.rs1 = (18,'x')
+                    elif temp_rlist_val == 6:
+                        temp_instrobj.rs1 = (9,'x')
+                    elif temp_rlist_val == 5:
+                        temp_instrobj.rs1 = (8,'x')
+                    elif temp_rlist_val == 4:
+                        temp_instrobj.rs1 = (1,'x')                       
+                if 'c_sreg1' in arg:
+                    treg = 's'
+                    temp_instrobj.rs1 = (int(get_arg_val(arg)(mcode), 2), treg)
+                if 'c_sreg2' in arg:
+                    treg = 's'
+                    temp_instrobj.rs2 = (int(get_arg_val(arg)(mcode), 2), treg)
+                if arg == 'c_index':
+                    imm_temp = get_arg_val(arg)(mcode)
+                    uimm = imm_temp 
+
                 if arg.find('imm') != -1:
                     if arg in ['imm12', 'imm20', 'zimm', 'imm2', 'imm3', 'imm4', 'imm5']:
                         imm = get_arg_val(arg)(mcode)
@@ -683,6 +720,10 @@ class disassembler():
                     if arg == 'c_uimm1':
                         imm_temp = get_arg_val(arg)(mcode)
                         uimm = imm_temp + '0'
+
+                    if arg == 'c_spimm':
+                        imm_temp = get_arg_val(arg)(mcode)
+                        uimm = imm_temp 
 
             if imm:
                 numbits = len(imm)

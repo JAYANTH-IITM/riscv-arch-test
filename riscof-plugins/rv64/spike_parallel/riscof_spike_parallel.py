@@ -115,10 +115,10 @@ class spike_parallel(pluginTemplate):
             self.flen = '64'
         if "Zcmp" in ispec['ISA']:
             self.isa += '_zcmp'
-            self.flen = '32'
+            self.flen = '64'
         if "Zcmt" in ispec['ISA']:
             self.isa += '_zcmt'
-            self.flen = '32'
+            self.flen = '64'
         if "Sdtrig" in ispec['ISA']:
             self.isa += 'sdtrig'
             self.flen = '0'
